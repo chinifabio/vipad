@@ -18,6 +18,7 @@ right_stick_y = 0.0
 left_stick_x = 0.0
 left_stick_y = 0.0
 gamepad_lock = Lock()
+mouse_captured = False  # Track if mouse is captured
 
 # Key states for all controls
 key_states = {
@@ -73,14 +74,14 @@ def handle_keyboard_input():
     pygame.display.set_caption("Ryujinx Controller Emulator - Focus this window for input!")
     clock = pygame.time.Clock()
     
-    # Center mouse for relative movement
-    pygame.mouse.set_pos(300, 200)
-    pygame.event.set_grab(True)
+    # Start with mouse not captured
+    mouse_captured = False
+    pygame.event.set_grab(False)
     
     print("Ryujinx Xbox 360 Controller Emulator Started!")
     print("Controls for Nintendo Switch games:")
     print("- WASD: Left stick (movement)")
-    print("- Mouse: Right stick (camera)")
+    print("- Mouse: Right stick (camera) - ONLY when captured")
     print("- Left Click: X button (confirm/primary)")
     print("- Right Click: A button (back/secondary)")
     print("- Space/C: Y button (jump/special)")
@@ -93,8 +94,10 @@ def handle_keyboard_input():
     print("- Enter: Start/Plus")
     print("- V: Left stick click (L3)")
     print("- Middle Click: Right stick click (R3)")
+    print("- F1: Toggle mouse capture ON/OFF")
     print("- ESC: Exit")
-    print("\nMake sure this window is focused!")
+    print("\nPress F1 to capture/release mouse for camera control!")
+    print("Mouse capture is currently: OFF")
     
     while running:
         for event in pygame.event.get():
@@ -106,6 +109,15 @@ def handle_keyboard_input():
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     break
+                elif event.key == pygame.K_F1:
+                    # Toggle mouse capture
+                    mouse_captured = not mouse_captured
+                    pygame.event.set_grab(mouse_captured)
+                    if mouse_captured:
+                        pygame.mouse.set_pos(300, 200)
+                        print("Mouse capture: ON - Mouse controls right stick")
+                    else:
+                        print("Mouse capture: OFF - Mouse is free")
                 # Movement keys
                 elif event.key == pygame.K_w:
                     key_states['w'] = True
@@ -266,17 +278,18 @@ def handle_keyboard_input():
                         gamepad.update()
             
             elif event.type == pygame.MOUSEMOTION:
-                # Handle mouse movement for right stick
-                rel_x, rel_y = event.rel
-                global right_stick_x, right_stick_y
-                
-                # Apply sensitivity and accumulate movement
-                right_stick_x += rel_x * mouse_sensitivity * 0.008  # Reduced multiplier for smoother control
-                right_stick_y += rel_y * mouse_sensitivity * 0.008
-                
-                # Clamp values
-                right_stick_x = max(-1.0, min(1.0, right_stick_x))
-                right_stick_y = max(-1.0, min(1.0, right_stick_y))
+                # Handle mouse movement for right stick only when captured
+                if mouse_captured:
+                    rel_x, rel_y = event.rel
+                    global right_stick_x, right_stick_y
+                    
+                    # Apply sensitivity and accumulate movement
+                    right_stick_x += rel_x * mouse_sensitivity * 0.008  # Reduced multiplier for smoother control
+                    right_stick_y += rel_y * mouse_sensitivity * 0.008
+                    
+                    # Clamp values
+                    right_stick_x = max(-1.0, min(1.0, right_stick_x))
+                    right_stick_y = max(-1.0, min(1.0, right_stick_y))
         
         # Update left stick based on WASD
         left_stick_x = 0.0
@@ -309,6 +322,7 @@ def handle_keyboard_input():
         
         # Status text
         status_text = [
+            f"Mouse Capture: {'ON' if mouse_captured else 'OFF'} (Press F1 to toggle)",
             f"Left Stick (WASD): ({left_stick_x:.2f}, {left_stick_y:.2f})",
             f"Right Stick (Mouse): ({right_stick_x:.2f}, {right_stick_y:.2f})",
             "",
@@ -323,7 +337,7 @@ def handle_keyboard_input():
             f"Start (Enter): {'ON' if key_states['enter'] else 'OFF'}",
             f"Select (Tab): {'ON' if key_states['tab'] else 'OFF'}",
             "",
-            "Press ESC to exit"
+            "Press F1 to toggle mouse capture | Press ESC to exit"
         ]
         
         for i, text in enumerate(status_text):
