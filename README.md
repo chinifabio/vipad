@@ -1,13 +1,32 @@
-# ViPad - Virtual Xbox 360 Controller
+# ViPad - Virtual Xbox 360 Controller for Ryujinx
 
-A Python application that emulates an Xbox 360 controller using mouse and keyboard inputs.
+A Python application that emulates an Xbox 360 controller using mouse and keyboard inputs, specifically optimized for use with Ryujinx Nintendo Switch emulator.
 
 ## Features
 
-- **WASD Keys** → Left analog stick
-- **Mouse Movement** → Right analog stick
-- **Left Mouse Button** → X button
-- **Spacebar** → Y button
+### Movement & Camera
+- **WASD Keys** → Left analog stick (character movement)
+- **Mouse Movement** → Right analog stick (camera control)
+
+### Face Buttons (Nintendo Switch layout)
+- **Left Mouse Button** → X button (confirm/primary action)
+- **Right Mouse Button** → A button (back/secondary action)  
+- **Z Key** → A button (alternative)
+- **Spacebar/C Key** → Y button (jump/special action)
+
+### Shoulder Buttons & Triggers
+- **Q Key** → L shoulder button
+- **E Key** → R shoulder button
+- **Left Shift** → ZL trigger (left trigger)
+- **Left Ctrl** → ZR trigger (right trigger)
+
+### System Buttons
+- **Tab** → Select/Minus button
+- **Enter** → Start/Plus button
+
+### Stick Clicks
+- **V Key** → Left stick click (L3)
+- **Middle Mouse Button** → Right stick click (R3)
 
 ## Requirements
 
@@ -23,39 +42,66 @@ A Python application that emulates an Xbox 360 controller using mouse and keyboa
    uv sync
    ```
 
-## Usage
+## Usage with Ryujinx
 
-Run the emulator:
-```bash
-uv run main.py
-```
+1. **Start the emulator**:
+   ```bash
+   uv run main.py
+   ```
 
-### Controls
+2. **Configure Ryujinx**:
+   - Open Ryujinx
+   - Go to Options → Settings → Input
+   - Select "Xbox Controller" as input device
+   - The virtual controller should appear automatically
 
-- **W/A/S/D**: Control the left analog stick (movement)
-- **Mouse movement**: Control the right analog stick (camera/look)
-- **Left mouse button**: X button (primary action)
-- **Spacebar**: Y button (secondary action)
-- **ESC**: Exit the emulator
+3. **Focus the pygame window** for input capture to work
 
-### Important Notes
+### Ryujinx-Specific Optimizations
 
-- The pygame window must be focused for input capture to work
-- Mouse input is captured relatively - move the mouse to control the right stick
-- The right stick will gradually return to center when not moving the mouse
-- All controller inputs are sent to the system as a virtual Xbox 360 controller
+- **Smaller deadzone** (0.05) for precise movement
+- **Higher sensitivity** for camera control in 3D games
+- **Slower decay rate** for right stick (better camera control)
+- **120 FPS input polling** for responsive controls
+- **Complete button mapping** including triggers and system buttons
+- **Multiple button options** (e.g., A button via both right-click and Z key)
 
-## How It Works
+## Controls Reference
 
-The application uses:
-- `vgamepad` to create a virtual Xbox 360 controller
-- `pygame` to capture keyboard and mouse input
-- Threading to handle input processing and controller updates
-
-The virtual controller will appear to games and applications as a real Xbox 360 controller connected to your system.
+| Input | Nintendo Switch | Xbox Equivalent | Common Use |
+|-------|----------------|-----------------|------------|
+| WASD | Left Stick | Left Stick | Movement |
+| Mouse | Right Stick | Right Stick | Camera |
+| Left Click | X | X | Confirm/Primary |
+| Right Click/Z | A | A | Back/Secondary |
+| Space/C | Y | Y | Jump/Special |
+| Q | L | LB | Left shoulder |
+| E | R | RB | Right shoulder |
+| Shift | ZL | LT | Left trigger |
+| Ctrl | ZR | RT | Right trigger |
+| Tab | - (Minus) | Back | Select/Menu |
+| Enter | + (Plus) | Start | Pause/Settings |
+| V | L3 | LS | Left stick click |
+| Middle Click | R3 | RS | Right stick click |
 
 ## Troubleshooting
 
-- Make sure the pygame window is focused
-- If the controller isn't detected by games, try restarting the application
-- Some games may require you to enable controller support in their settings
+### General Issues
+- Make sure the pygame window is focused and visible
+- If controller isn't detected, restart both the emulator and Ryujinx
+- Check Ryujinx input settings to ensure Xbox controller is selected
+
+### Ryujinx-Specific Issues
+- **Controller not detected**: Restart Ryujinx after starting the emulator
+- **Input lag**: Close unnecessary applications, ensure 120 FPS mode is working
+- **Wrong button mapping**: Verify Ryujinx is set to "Xbox Controller" mode
+- **Stick drift**: Adjust `mouse_sensitivity` in the code if needed
+
+### Performance Tips
+- Keep the pygame window focused but you can minimize it
+- For demanding games, consider lowering the polling rate from 120 to 60 FPS
+- Adjust mouse sensitivity in the code for your preference
+
+## How It Works
+
+The application creates a virtual Xbox 360 controller that Ryujinx recognizes as a real controller. The mapping is optimized for Nintendo Switch games running in Ryujinx, with proper trigger support, system buttons, and camera controls suitable for 3D games.
