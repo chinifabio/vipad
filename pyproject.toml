@@ -1,0 +1,10 @@
+[project]
+name = "vipad"
+version = "0.1.0"
+description = "Virtual gamepad - Xbox 360 controller emulator using mouse and keyboard"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pygame>=2.5.0",
+    "vgamepad>=0.1.0"
+]
